@@ -11,10 +11,6 @@ import json
 import re
 import urllib
 
-driver = webdriver.Chrome()
-
-driver.get("https://rp5.ru/Weather_archive_in_Usti_nad_Labem")
-
 def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: str):
     wmo_id_input_ele = driver.find_element(By.ID, 'wmo_id')
     wmo_id_input_ele.clear()
@@ -38,6 +34,16 @@ def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: st
     download_button_ele = WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@id="f_result"]/a')))
     download_button_ele.click()
 
-if __name__ == '__main__':
-    get_synop('11450', driver, '1.1.2023', '31.12.2023')
+def main():
+    stations = []
+    with open('stations.csv', 'r') as f:
+        for line in f.readlines():
+            stations.append(line.split(',')[1].split('-')[-1].split('|')[0])
+    driver = webdriver.Chrome()
+    driver.get("https://rp5.ru/Weather_archive_in_Usti_nad_Labem")
+    for station_id in stations:
+        get_synop(station_id, driver, '1.1.2014', '31.12.2014')
     input()
+
+if __name__ == '__main__':
+    main()
