@@ -22,7 +22,9 @@ def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: st
     wmo_id_input_ele.send_keys(wmo_id)
     time.sleep(3)
     station_link = driver.find_elements(By.CSS_SELECTOR, '.ac_even')
-    if not station_link: return
+    if not station_link:
+        wmo_id_input_ele.clear()
+        return
     else: station_link = station_link[0]
     station_link.click()
     time.sleep(.5)
@@ -59,8 +61,9 @@ def main():
     driver = webdriver.Chrome()
     driver.get("https://rp5.ru/Weather_archive_in_Usti_nad_Labem")
     for station_id in stations:
-        get_synop(station_id, driver, '1.1.2013', '31.12.2015')
+        get_synop(station_id, driver, '1.1.2018', '31.12.2023')
     input()
 
 if __name__ == '__main__':
-    decompress_files('downloaded_data')
+    main()
+    # decompress_files('downloaded_data')
