@@ -35,7 +35,9 @@ def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: st
     driver.find_element(By.ID, 'format2').find_element(By.XPATH, '..').click() # csv format
     driver.find_element(By.ID, 'coding2').find_element(By.XPATH, '..').click() # utf-8 enc
     driver.find_element(By.CSS_SELECTOR, '.download div.archButton').click() # select to file GZ archive
+    time.sleep(.5)
+    driver.find_element(By.XPATH, '//*[@id="f_result"]/a').click()
 
 if __name__ == '__main__':
-    get_synop('11520', driver, '1.1.2023', '31.12.2023')
+    get_synop('11450', driver, '1.1.2023', '31.12.2023')
     input()
