@@ -8,6 +8,8 @@ from selenium.webdriver import Keys
 import time
 import requests
 import threading
+import os
+import gzip
 
 def download_file_from_url(url, filename):
     response = requests.get(url)
@@ -39,6 +41,16 @@ def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: st
     filename = f"downloaded_data/{wmo_id}_{from_date}-{to_date}.csv.gz"
     threading.Thread(target = download_file_from_url, args = [url, filename]).start()
 
+def decompress_files(folder_path, result_path='data'):
+    for filename in os.listdir(folder_path):
+        with gzip.open(f"{folder_path}/{filename}", 'rb') as f:
+            with open(f'{result_path}/{filename.replace('.gz', '')}', 'w') as o:
+                for line in f.readlines()[7:]:
+                    o.write(line.decode("utf-8").strip().split(';')[0])
+                    o.write(';')
+                    o.write(line.decode("utf-8").strip().split(';')[11])
+                    o.write('\n')
+
 def main():
     stations = []
     with open('stations.csv', 'r') as f:
@@ -47,8 +59,8 @@ def main():
     driver = webdriver.Chrome()
     driver.get("https://rp5.ru/Weather_archive_in_Usti_nad_Labem")
     for station_id in stations:
-        get_synop(station_id, driver, '1.1.2014', '31.12.2014')
+        get_synop(station_id, driver, '1.1.2013', '31.12.2015')
     input()
 
 if __name__ == '__main__':
-    main()
+    decompress_files('downloaded_data')
