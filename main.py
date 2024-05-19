@@ -7,9 +7,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Keys
 import time
 import requests
-import json
-import re
-import urllib
+import threading
+
+def download_file_from_url(url, filename):
+    response = requests.get(url)
+    with open(filename, mode='wb') as f:
+        f.write(response.content)
 
 def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: str):
     wmo_id_input_ele = driver.find_element(By.ID, 'wmo_id')
@@ -32,7 +35,9 @@ def get_synop(wmo_id: str, driver: webdriver.Chrome, from_date: str, to_date: st
     driver.find_element(By.ID, 'coding2').find_element(By.XPATH, '..').click() # utf-8 enc
     driver.find_element(By.CSS_SELECTOR, '.download div.archButton').click() # select to file GZ archive
     download_button_ele = WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@id="f_result"]/a')))
-    download_button_ele.click()
+    url = download_button_ele.get_attribute('href')
+    filename = f"downloaded_data/{wmo_id}_{from_date}-{to_date}.csv.gz"
+    threading.Thread(target = download_file_from_url, args = [url, filename]).start()
 
 def main():
     stations = []
